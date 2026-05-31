@@ -38,7 +38,7 @@ jobs:
 
       - name: Update config repo with new image tag
         run: |
-          # Clone the config repo to update the client deployment with the new image tag
+          # Clone the config repo to update the client deploymen with the new image tag
           git clone https://x-access-token:${{ secrets.CONFIG_REPO_TOKEN }}@github.com/Abrorjon77/emart-k8s-config.git
           cd emart-k8s-config
 
