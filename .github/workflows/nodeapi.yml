@@ -37,11 +37,15 @@ jobs:
           docker push $IMAGE_NAME:latest
 
       - name: Update config repo with new image tag
+        env:
+          IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/emart-nodeapi
         run: |
           git clone https://x-access-token:${{ secrets.CONFIG_REPO_TOKEN }}@github.com/Abrorjon77/emart-k8s-config.git
           cd emart-k8s-config
 
-          sed -i "s|$IMAGE_NAME:.*|$IMAGE_NAME:${{ github.sha }}|" nodeapi/deployment.yaml
+          echo "Updating image to: $IMAGE_NAME:${{ github.sha }}"
+
+          sed -i "s|image: $IMAGE_NAME:.*|image: $IMAGE_NAME:${{ github.sha }}|" nodeapi/deployment.yaml
 
           git config user.email "github-actions@github.com"
           git config user.name "GitHub Actions"
