@@ -36,7 +36,7 @@ jobs:
           docker push $IMAGE_NAME:${{ github.sha }}
           docker push $IMAGE_NAME:latest
 
-      - name: Update config repo with new image tag
+      - name: Update config repo with new imag tag
         env:
           IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/emart-client
         run: |
