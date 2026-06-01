@@ -109,3 +109,4 @@ After a successful image push, each workflow updates the image tag in a separate
 └── .github/
     └── workflows/   # CI/CD pipelines
 ```
+trigger
