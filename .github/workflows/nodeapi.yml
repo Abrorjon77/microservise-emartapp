@@ -24,17 +24,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Docker image
-        run: |
-          docker build \
-            -t $IMAGE_NAME:${{ github.sha }} \
-            -t $IMAGE_NAME:latest \
-            ./nodeapi
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Push Docker image
-        run: |
-          docker push $IMAGE_NAME:${{ github.sha }}
-          docker push $IMAGE_NAME:latest
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./nodeapi
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Update config repo with new image tag
         env:
@@ -42,11 +44,8 @@ jobs:
         run: |
           git clone https://x-access-token:${{ secrets.CONFIG_REPO_TOKEN }}@github.com/Abrorjon77/emart-k8s-config.git
           cd emart-k8s-config
-
           echo "Updating image to: $IMAGE_NAME:${{ github.sha }}"
-
           sed -i "s|image: $IMAGE_NAME:.*|image: $IMAGE_NAME:${{ github.sha }}|" nodeapi/deployment.yaml
-
           git config user.email "github-actions@github.com"
           git config user.name "GitHub Actions"
           git add nodeapi/deployment.yaml
