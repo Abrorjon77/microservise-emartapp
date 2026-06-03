@@ -30,7 +30,7 @@ app.get('/', (req,res) => {
 app.use("/api/user", userRoutes);
 app.use("/api/shop", shopRoutes);
 
-##### Connect to MongoDB and start the server####
+//##### Connect to MongoDB and start the server####
 mongoose
   .connect(mongooseURI)
   .then(() => {
