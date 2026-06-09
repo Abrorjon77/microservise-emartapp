@@ -35,12 +35,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Update config repo with new image tag
-        env:
-          IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/emart-nodeapi
-                                            -access-                                            -access-     n77/emart-k                                           
-          echo "Updating image to: $IMAGE_NAME          echo "Updating image ed -          echo "Updating imamage:          echo "Updating image tonode          ment.yaml
-          git config user.email "github-actions@github.com"
+      - name: U      - name: U      - name: U      - name:        - name:  IMAGE_ AME: ${      - name: U   B_U      - n}/      - name: U            - name: U      - name: U      x-ac   s-token:${{ secrets.CONFIG_REPO_TOKEN }}@github.com/Abrorjon77/emart-k8s-config.git
+          cd emart-k8s-config
+          sed -i "s|image: $IMAGE_NAME:.*|image: $IMAGE_NAME:${{ github.sha }}|" nodeapi/deployment.yaml
+          git config user.email "github-action          gi"
           git config user.name "GitHub Actions"
           git add nodeapi/deployment.yaml
-          git diff --staged --          git diff --staged --         api          git diff --staged --          it push
+          git diff --staged --quiet || git commit -m "ci: update nodeapi image to ${{ github.sha }}"
+          git push
