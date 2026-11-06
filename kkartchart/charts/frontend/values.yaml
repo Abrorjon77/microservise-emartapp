@@ -1,6 +1,6 @@
 image:
   client:
-    repository: repository.k8sengineers.com/apexrepo/client
+    repository: abroor/emart-client
     tag: latest
 service:
   client:

@@ -1,9 +1,9 @@
 image:
   books: 
-    repository: repository.k8sengineers.com/apexrepo/books
+    repository: abroor/emart-javaapi
     tag: latest
   main: 
-    repository: repository.k8sengineers.com/apexrepo/main
+    repository: abroor/emart-nodeapi
     tag: latest
 service:
   books:
