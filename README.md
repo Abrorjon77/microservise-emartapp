@@ -99,28 +99,9 @@ After a successful image push, each workflow updates the image tag in a separate
 | `DOCKERHUB_TOKEN` | DockerHub access token |
 | `CONFIG_REPO_TOKEN` | GitHub PAT with write access to the k8s config repo |
 
-## Kubernetes (Helm)
+## Kubernetes Deployment
 
-The [kkartchart/](kkartchart/) Helm chart deploys the whole stack. It pulls the `latest` images from DockerHub:
-
-| Subchart | Image |
-|----------|-------|
-| `frontend` | `abroor/emart-client` |
-| `backend` (books) | `abroor/emart-javaapi` |
-| `backend` (main) | `abroor/emart-nodeapi` |
-| `database` | `mongo`, `mysql` |
-
-```bash
-helm install emart ./kkartchart
-```
-
-To deploy a specific build instead of `latest`, override the tag with a commit SHA:
-
-```bash
-helm install emart ./kkartchart --set backend.image.main.tag=<commit-sha>
-```
-
-> The ingress host in the subchart `values.yaml` files is still a placeholder (`kubekart.k8sengineers.com`). Set it to your own domain before exposing the app.
+Kubernetes manifests live in the separate config repo [`emart-k8s-config`](https://github.com/Abrorjon77/emart-k8s-config). Argo CD deploys the `helm/emart` chart from that repo to the `emart` namespace and keeps the cluster in sync with it.
 
 ## Project Structure
 
@@ -130,7 +111,6 @@ helm install emart ./kkartchart --set backend.image.main.tag=<commit-sha>
 ├── nodeapi/         # Node.js / Express API
 ├── javaapi/         # Spring Boot API
 ├── nginx/           # Nginx gateway config
-├── kkartchart/      # Helm chart for Kubernetes
 ├── docker-compose.yaml
 └── .github/
     └── workflows/   # CI/CD pipelines
