@@ -42,9 +42,11 @@ jobs:
           git clone https://x-access-token:${{ secrets.CONFIG_REPO_TOKEN }}@github.com/Abrorjon77/emart-k8s-config.git
           cd emart-k8s-config
           echo "Updating image to: $IMAGE_NAME:${{ github.sha }}"
-          sed -i "s|image: $IMAGE_NAME:.*|image: $IMAGE_NAME:${{ github.sha }}|" javaapi/deployment.yaml
+          # Argo CD deploys helm/emart, so bump the tag on the line after this image's repository
+          sed -i "\\|repository: $IMAGE_NAME\$|{n;s|tag: .*|tag: ${{ github.sha }}|;}" helm/emart/values.yaml
+          grep -A1 "repository: $IMAGE_NAME\$" helm/emart/values.yaml | grep -q "tag: ${{ github.sha }}"
           git config user.email "github-actions@github.com"
           git config user.name "GitHub Actions"
-          git add javaapi/deployment.yaml
+          git add helm/emart/values.yaml
           git diff --staged --quiet || git commit -m "ci: update javaapi image to ${{ github.sha }}"
           git push
