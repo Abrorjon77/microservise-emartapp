@@ -41,7 +41,7 @@ A full-stack e-commerce application built with a microservices architecture, con
 ## Running Locally
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/microservise-emartapp.git
+git clone https://github.com/Abrorjon77/microservise-emartapp.git
 cd microservise-emartapp
 ```
 
@@ -83,9 +83,11 @@ Each service has its own GitHub Actions workflow in [.github/workflows/](.github
 
 | Workflow | Trigger | Action |
 |----------|---------|--------|
-| `client.yml` | Push to `main` (client changes) | Build & push Docker image to DockerHub |
-| `nodeapi.yml` | Push to `main` (nodeapi changes) | Build & push Docker image to DockerHub |
-| `javaapi.yml` | Push to `main` (javaapi changes) | Build & push Docker image to DockerHub |
+| `client.yml` | Push to `main` (client changes) | Build & push `emart-client` image (amd64) |
+| `nodeapi.yml` | Push to `main` (nodeapi changes) | Build & push `emart-nodeapi` image (amd64 + arm64) |
+| `javaapi.yml` | Push to `main` (javaapi changes) | Build & push `emart-javaapi` image (amd64 + arm64) |
+
+Every build is pushed to DockerHub with two tags: the commit SHA and `latest`.
 
 After a successful image push, each workflow updates the image tag in a separate GitOps config repo (`emart-k8s-config`) which triggers a Kubernetes deployment.
 
@@ -97,6 +99,29 @@ After a successful image push, each workflow updates the image tag in a separate
 | `DOCKERHUB_TOKEN` | DockerHub access token |
 | `CONFIG_REPO_TOKEN` | GitHub PAT with write access to the k8s config repo |
 
+## Kubernetes (Helm)
+
+The [kkartchart/](kkartchart/) Helm chart deploys the whole stack. It pulls the `latest` images from DockerHub:
+
+| Subchart | Image |
+|----------|-------|
+| `frontend` | `abroor/emart-client` |
+| `backend` (books) | `abroor/emart-javaapi` |
+| `backend` (main) | `abroor/emart-nodeapi` |
+| `database` | `mongo`, `mysql` |
+
+```bash
+helm install emart ./kkartchart
+```
+
+To deploy a specific build instead of `latest`, override the tag with a commit SHA:
+
+```bash
+helm install emart ./kkartchart --set backend.image.main.tag=<commit-sha>
+```
+
+> The ingress host in the subchart `values.yaml` files is still a placeholder (`kubekart.k8sengineers.com`). Set it to your own domain before exposing the app.
+
 ## Project Structure
 
 ```
@@ -105,8 +130,8 @@ After a successful image push, each workflow updates the image tag in a separate
 ├── nodeapi/         # Node.js / Express API
 ├── javaapi/         # Spring Boot API
 ├── nginx/           # Nginx gateway config
+├── kkartchart/      # Helm chart for Kubernetes
 ├── docker-compose.yaml
 └── .github/
     └── workflows/   # CI/CD pipelines
 ```
-trigger
